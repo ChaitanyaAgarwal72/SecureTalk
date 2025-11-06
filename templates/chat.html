@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureTalk - {% if room_name %}{{ room_name }}{% else %}Encrypted Chat{% endif %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <div class="app-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>SecureTalk</h1>
+                    {% if room_name %}
+                        <span class="room-name">{{ room_name }}</span>
+                        <span class="room-code">{{ room }}</span>
+                    {% endif %}
+                    <span class="encryption-badge">🔒 End-to-End Encrypted</span>
+                </div>
+                <div class="user-info">
+                    <a href="/" class="stats-link" title="Back to Main Menu">
+                        <i class="fas fa-home"></i> Main Menu
+                    </a>
+                    <a href="/network-stats?return_room={{ room }}&return_name={{ room_name | urlencode }}" class="stats-link" title="View Network Statistics">
+                        <i class="fas fa-chart-bar"></i> Network Stats
+                    </a>
+                    <span id="user-count" class="user-count">0 users online</span>
+                    <span id="username" class="username">Connecting...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-message">
+                <i class="fas fa-comments"></i>
+                <h2>Welcome to SecureTalk!</h2>
+                <p>🔒 Your messages are encrypted end-to-end with <strong>ASCON-AEAD128</strong></p>
+                <p>🌐 Protocol: <strong>WebSocket over TCP/IP</strong></p>
+                <p>🛡️ Network Security: <strong>End-to-End Encryption</strong></p>
+                <div class="network-info-display">
+                    <div class="info-badge">
+                        <i class="fas fa-server"></i>
+                        <span>Client-Server Architecture</span>
+                    </div>
+                    <div class="info-badge">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Real-time Communication</span>
+                    </div>
+                    <div class="info-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure Message Routing</span>
+                    </div>
+                </div>
+                <p>Start chatting to see network activity...</p>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span class="typing-text">Someone is typing...</span>
+        </div>
+
+        <div class="chat-input">
+            <div id="smart-replies" class="smart-replies" style="display: none;"></div>
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Type your encrypted message..." maxlength="500">
+                <button id="send-button" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="chat-footer">
+                <small>🔐 Messages are encrypted with ASCON-AEAD128</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        const roomCode = '{{ room if room else "default" }}';
+        const roomName = '{{ room_name if room_name else "General Chat" }}';
+    </script>
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>

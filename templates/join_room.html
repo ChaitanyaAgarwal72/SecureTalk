@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Room - SecureTalk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .join-room-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6c757d;
+        }
+
+        .join-methods {
+            margin-bottom: 2rem;
+        }
+
+        .method-tab {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .method-tab button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .method-tab button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .join-form {
+            display: none;
+        }
+
+        .join-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .room-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .room-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .room-item:hover {
+            background: #e3f2fd;
+        }
+
+        .room-item:last-child {
+            border-bottom: none;
+        }
+
+        .room-name {
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-code {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .join-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="join-room-container">
+        <div class="form-header">
+            <h1><i class="fas fa-door-open"></i> Join Room</h1>
+            <p>Enter an existing chat room</p>
+        </div>
+
+        <div class="join-methods">
+            <div class="method-tab">
+                <button class="method-btn active" data-method="code">Room Code</button>
+                <button class="method-btn" data-method="browse">Browse Rooms</button>
+            </div>
+
+            <div id="codeForm" class="join-form active">
+                <form id="joinByCodeForm">
+                    <div class="form-group">
+                        <label for="roomCode">Enter Room Code</label>
+                        <input type="text" id="roomCode" name="roomCode" placeholder="ABC123" maxlength="6" required>
+                        <small style="color: #6c757d; font-size: 0.8rem;">Ask the room creator for the 6-character code</small>
+                    </div>
+                    
+                    <button type="submit" class="join-btn">
+                        <i class="fas fa-sign-in-alt"></i> Join Room
+                    </button>
+                </form>
+            </div>
+
+            <div id="browseForm" class="join-form">
+                <div class="form-group">
+                    <label>Available Public Rooms</label>
+                    <div class="room-list" id="roomList">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Main Menu
+        </a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.method-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.join-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(this.dataset.method + 'Form').classList.add('active');
+                
+                if (this.dataset.method === 'browse') {
+                    loadAvailableRooms();
+                }
+            });
+        });
+
+        document.getElementById('joinByCodeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const roomCode = document.getElementById('roomCode').value.toUpperCase();
+            joinRoom(roomCode);
+        });
+
+        document.getElementById('roomCode').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        async function joinRoom(roomCode) {
+            try {
+                const response = await fetch(`/api/room/${roomCode}`);
+                
+                if (response.ok) {
+                    const roomData = await response.json();
+                    window.location.href = `/chat?room=${roomCode}&name=${encodeURIComponent(roomData.name)}`;
+                } else {
+                    alert('Room not found! Please check the room code and try again.');
+                }
+            } catch (error) {
+                console.error('Error checking room:', error);
+                alert('Error connecting to server. Please try again.');
+            }
+        }
+
+        async function loadAvailableRooms() {
+            const roomListContainer = document.getElementById('roomList');
+            
+            try {
+                roomListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading available rooms...</p>
+                    </div>
+                `;
+
+                const response = await fetch('/api/rooms');
+                const rooms = await response.json();
+                
+                const roomsArray = Object.values(rooms);
+                
+                if (roomsArray.length === 0) {
+                    roomListContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p>No public rooms available</p>
+                            <small>Create a room to get started</small>
+                        </div>
+                    `;
+                } else {
+                    roomListContainer.innerHTML = roomsArray.map(room => `
+                        <div class="room-item" onclick="joinRoom('${room.code}')">
+                            <div class="room-name">${room.name}</div>
+                            <div class="room-info">
+                                <span>${room.description || 'No description'} • ${room.currentUsers}/${room.maxUsers} users</span>
+                                <span class="room-code">${room.code}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                roomListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load rooms</p>
+                        <small>Please try again later</small>
+                    </div>
+                `;
+            }
+        }
+
+        if (document.querySelector('.method-btn[data-method="browse"]').classList.contains('active')) {
+            loadAvailableRooms();
+        }
+    </script>
+</body>
+</html>

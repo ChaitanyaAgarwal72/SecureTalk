@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Room - SecureTalk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .create-room-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6c757d;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .room-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .feature-card.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-card input[type="checkbox"] {
+            display: none;
+        }
+
+        .feature-card label {
+            cursor: pointer;
+            display: block;
+            margin: 0;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .create-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="create-room-container">
+        <div class="form-header">
+            <h1><i class="fas fa-plus-circle"></i> Create New Room</h1>
+            <p>Set up your own secure chat room</p>
+        </div>
+
+        <form id="createRoomForm">
+            <div class="form-group">
+                <label for="roomName">Room Name</label>
+                <input type="text" id="roomName" name="roomName" placeholder="Enter room name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="roomDescription">Room Description (Optional)</label>
+                <textarea id="roomDescription" name="roomDescription" placeholder="Describe your room..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="maxUsers">Maximum Users</label>
+                <select id="maxUsers" name="maxUsers">
+                    <option value="2">2 Users</option>
+                    <option value="5">5 Users</option>
+                    <option value="10" selected>10 Users</option>
+                    <option value="25">25 Users</option>
+                    <option value="50">50 Users</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Room Features</label>
+                <div class="room-features">
+                    <div class="feature-card active">
+                        <input type="checkbox" id="encryption" name="features" value="encryption" checked>
+                        <label for="encryption">
+                            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                            <div>End-to-End Encryption</div>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-card active">
+                        <input type="checkbox" id="messageHistory" name="features" value="messageHistory" checked>
+                        <label for="messageHistory">
+                            <div class="feature-icon"><i class="fas fa-history"></i></div>
+                            <div>Message History</div>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-card active">
+                        <input type="checkbox" id="typing" name="features" value="typing" checked>
+                        <label for="typing">
+                            <div class="feature-icon"><i class="fas fa-keyboard"></i></div>
+                            <div>Typing Indicators</div>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-card active">
+                        <input type="checkbox" id="timestamps" name="features" value="timestamps" checked>
+                        <label for="timestamps">
+                            <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                            <div>Message Timestamps</div>
+                        </label>
+                    </div>
+                </div>
+                <small style="color: #6c757d; display: block; margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> All features are currently enabled by default
+                </small>
+            </div>
+
+            <button type="submit" class="create-btn">
+                <i class="fas fa-plus"></i> Create Room
+            </button>
+        </form>
+
+        <a href="/" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Main Menu
+        </a>
+    </div>
+
+    <div id="roomCreatedModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle" style="color: #4CAF50;"></i> Room Created Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="room-code-display">
+                    <label>Your Room Code:</label>
+                    <div class="room-code-large" id="displayedRoomCode">ABC123</div>
+                    <button id="copyRoomCode" class="copy-btn">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                </div>
+                <div class="room-details">
+                    <p><strong>Room Name:</strong> <span id="displayedRoomName"></span></p>
+                    <p><strong>Max Users:</strong> <span id="displayedMaxUsers"></span></p>
+                    <p class="share-message">Share this code with others to join your room!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="joinRoomNow" class="join-now-btn">
+                    <i class="fas fa-sign-in-alt"></i> Join Room Now
+                </button>
+                <button id="closeModal" class="close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            color: #1e3c72;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .room-code-display {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .room-code-display label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .room-code-large {
+            font-family: 'Courier New', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .room-details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .room-details p {
+            margin: 0.5rem 0;
+            color: #1e3c72;
+        }
+
+        .share-message {
+            font-style: italic;
+            color: #6c757d !important;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .join-now-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .join-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .close-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #545b62;
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .modal-header, .modal-body, .modal-footer {
+                padding: 1rem;
+            }
+
+            .room-code-large {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .join-now-btn {
+                max-width: none;
+            }
+        }
+    </style>
+
+    <script>
+        document.querySelectorAll('.feature-card input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const card = this.closest('.feature-card');
+                if (this.checked) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        });
+
+        document.getElementById('createRoomForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const roomData = {
+                name: formData.get('roomName'),
+                description: formData.get('roomDescription'),
+                maxUsers: parseInt(formData.get('maxUsers')),
+                features: Array.from(formData.getAll('features')),
+                isPublic: true
+            };
+
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                submitBtn.disabled = true;
+
+                const response = await fetch('/api/create-room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(roomData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showRoomCreatedModal(result.roomCode, result.roomData);
+                } else {
+                    alert('Failed to create room: ' + (result.error || 'Unknown error'));
+                }
+
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error creating room:', error);
+                alert('Failed to create room. Please try again.');
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Create Room';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showRoomCreatedModal(roomCode, roomData) {
+            document.getElementById('displayedRoomCode').textContent = roomCode;
+            document.getElementById('displayedRoomName').textContent = roomData.name;
+            document.getElementById('displayedMaxUsers').textContent = roomData.maxUsers;
+            
+            document.getElementById('roomCreatedModal').style.display = 'flex';
+            
+            document.getElementById('copyRoomCode').onclick = function() {
+                navigator.clipboard.writeText(roomCode).then(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    this.style.background = 'rgba(76, 175, 80, 0.3)';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+                        this.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }, 2000);
+                }).catch(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = roomCode;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    this.style.background = 'rgba(76, 175, 80, 0.3)';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+                        this.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }, 2000);
+                });
+            };
+            
+            document.getElementById('joinRoomNow').onclick = function() {
+                window.location.href = `/chat?room=${roomCode}&name=${encodeURIComponent(roomData.name)}`;
+            };
+            
+            document.getElementById('closeModal').onclick = function() {
+                document.getElementById('roomCreatedModal').style.display = 'none';
+            };
+            
+            document.getElementById('roomCreatedModal').onclick = function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            };
+        }
+    </script>
+</body>
+</html>
